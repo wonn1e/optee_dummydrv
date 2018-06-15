@@ -588,6 +588,18 @@ void thread_add_mutex(struct mutex *m);
 void thread_rem_mutex(struct mutex *m);
 
 /*
+* Wonnie DUMMY DRV
+*/
+struct dummy_data * thread_open_dummy_drv(void);
+///bool thread_open_dummy_drv(void);
+bool thread_close_dummy_drv(void);
+////-struct dummy_data * thread_read_dummy_drv(void);
+bool thread_read_dummy_drv(void);
+///char thread_read_dummy_drv(int idx);
+////-bool thread_read_dummy_drv(void);
+bool thread_write_dummy_drv(void);
+bool thread_reset_dummy_drv(int cmd);
+/*
  * Disables and empties the prealloc RPC cache one reference at a time. If
  * all threads are idle this function returns true and a cookie of one shm
  * object which was removed from the cache. When the cache is empty *cookie

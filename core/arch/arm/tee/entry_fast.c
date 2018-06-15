@@ -35,6 +35,7 @@
 #include <kernel/tee_l2cc_mutex.h>
 #include <kernel/misc.h>
 #include <mm/core_mmu.h>
+#include <drivers/dummy_drv.h>
 
 static void tee_entry_get_shm_config(struct thread_smc_args *args)
 {
@@ -143,6 +144,74 @@ static void tee_entry_enable_shm_cache(struct thread_smc_args *args)
 		args->a0 = OPTEE_SMC_RETURN_EBUSY;
 }
 
+struct dummy_data * dummytmp;
+/*Wonnie start DUMMY DRV*/
+static void tee_entry_dummy_open(struct thread_smc_args *args){
+	args->a0 = OPTEE_SMC_RETURN_OK;
+	dummytmp = thread_open_dummy_drv();
+	if(!dummytmp){	//NULL
+		args->a1 = OPTEE_SMC_DUMMY_FAIL;	
+	}else{
+		args->a1 = OPTEE_SMC_DUMMY_SUCCESS;
+	}
+}
+
+static void tee_entry_dummy_close(struct thread_smc_args *args){
+	args->a0 = OPTEE_SMC_RETURN_OK;
+
+	dummytmp = NULL;
+
+        if(thread_close_dummy_drv()){
+                args->a1 = OPTEE_SMC_DUMMY_SUCCESS; 
+        }
+        else
+                args->a1 = OPTEE_SMC_DUMMY_FAIL;
+
+}
+
+static void tee_entry_dummy_read(struct thread_smc_args *args){
+	args->a0 = OPTEE_SMC_RETURN_OK;
+	
+	if(thread_read_dummy_drv()){
+		args->a1 = dummytmp->w[0];
+		args->a2 = dummytmp->w[1];
+		args->a3 = dummytmp->w[2];
+	}else{
+		args->a1 = OPTEE_SMC_DUMMY_FAIL;
+	}
+	
+}
+
+static void tee_entry_dummy_write(struct thread_smc_args *args){
+	dummytmp->w[0] = args->a1;
+	dummytmp->w[1] = args->a2;
+	dummytmp->w[2] = args->a3;
+	dummytmp->w[3] = args->a4;
+
+        args->a0 = OPTEE_SMC_RETURN_OK;
+        if(thread_write_dummy_drv()){
+                args->a1 = OPTEE_SMC_DUMMY_SUCCESS;
+        }
+        else
+                args->a1 = OPTEE_SMC_DUMMY_FAIL;
+
+}
+
+static void tee_entry_dummy_reset(struct thread_smc_args *args){
+	int command_type;
+	command_type = args->a1;	//0 : read
+					//1 : write
+
+	args->a0 = OPTEE_SMC_RETURN_OK;
+	if(thread_reset_dummy_drv(command_type))
+		args->a1 = OPTEE_SMC_DUMMY_SUCCESS;
+	else
+		args->a1 = OPTEE_SMC_DUMMY_SUCCESS;
+}
+
+
+/*Wonnie end*/
+
 static void tee_entry_boot_secondary(struct thread_smc_args *args)
 {
 #if defined(CFG_BOOT_SECONDARY_REQUEST)
@@ -158,6 +227,24 @@ static void tee_entry_boot_secondary(struct thread_smc_args *args)
 void tee_entry_fast(struct thread_smc_args *args)
 {
 	switch (args->a0) {
+
+	/* DUMMY DRV :: Wonnie start*/
+	case OPTEE_SMC_OPEN_DUMMY:             
+                tee_entry_dummy_open(args);
+                break;
+        case OPTEE_SMC_CLOSE_DUMMY:
+                tee_entry_dummy_close(args);
+                break;
+        case OPTEE_SMC_READ_DUMMY:
+                tee_entry_dummy_read(args);
+                break;
+        case OPTEE_SMC_WRITE_DUMMY:
+                tee_entry_dummy_write(args);
+                break;
+        case OPTEE_SMC_RESET_DUMMY:
+                tee_entry_dummy_reset(args);
+                break;                          
+	/*----------------- Wonnie end */	
 
 	/* Generic functions */
 	case OPTEE_SMC_CALLS_COUNT:

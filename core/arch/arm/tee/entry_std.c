@@ -526,7 +526,8 @@ void __weak tee_entry_std(struct thread_smc_args *smc_args)
 		DMSG("Expected 0x%x\n", OPTEE_SMC_CALL_WITH_ARG);
 		smc_args->a0 = OPTEE_SMC_RETURN_EBADCMD;
 		return;
-	}
+	}	
+	
 	parg = (uint64_t)smc_args->a1 << 32 | smc_args->a2;
 
 	/* Check if this region is in static shared space */
@@ -578,6 +579,7 @@ void __weak tee_entry_std(struct thread_smc_args *smc_args)
 		smc_args->a0 = OPTEE_SMC_RETURN_EBADCMD;
 	}
 	mobj_free(mobj);
+
 }
 
 static TEE_Result default_mobj_init(void)

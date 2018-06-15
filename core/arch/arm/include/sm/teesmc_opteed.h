@@ -117,4 +117,16 @@
 #define TEESMC_OPTEED_RETURN_SYSTEM_RESET_DONE \
 	TEESMC_OPTEED_RV(TEESMC_OPTEED_FUNCID_RETURN_SYSTEM_RESET_DONE)
 
+/*
+* Writer: Wonnie WONNIE
+* DUMMY DRV open --> allocate memory
+*
+* Register usage:
+* r0/x0         SMC Function ID, TEESMC_OPTEED_DUMMY_OPEN
+* r1/x1         0 on success and anything else to indicate error condition
+*/
+#define TEESMC_OPTEED_FUNCID_RETURN_DUMMY_OPEN          9
+#define TEESMC_OPTEED_DUMMY_OPEN \
+        TEESMC_OPTEED_RV(TEESMC_OPTEED_FUNCID_RETURN_DUMMY_OPEN)
+
 #endif /*TEESMC_OPTEED_H*/

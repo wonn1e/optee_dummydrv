@@ -53,6 +53,7 @@
 #include <tee/tee_fs_rpc.h>
 #include <trace.h>
 #include <util.h>
+#include <drivers/dummy_drv.h>	//Wonnie DUMMY DRV
 
 #include "thread_private.h"
 
@@ -1312,6 +1313,41 @@ void thread_rem_mutex(struct mutex *m)
 	m->owner_id = MUTEX_OWNER_ID_NONE;
 	TAILQ_REMOVE(&threads[ct].mutexes, m, link);
 }
+
+/*Wonnie DUMMY DRV start*/
+
+struct dummy_data * thread_open_dummy_drv(void){
+	return tee_dummy_open();
+}
+
+bool thread_close_dummy_drv(void){
+	if(tee_dummy_close() == 0)
+                return true;
+        else
+                return false;
+}
+
+bool thread_read_dummy_drv(void){
+	if(tee_dummy_read() == 0)
+		return true;
+	else
+		return false;
+}
+
+bool thread_write_dummy_drv(void){
+	
+	if(tee_dummy_write()==0)
+		return true;
+	else
+		return false;
+}
+
+bool thread_reset_dummy_drv(int cmd){
+	if(tee_dummy_reset(cmd) == 0)
+		return true;
+	else	return false;
+}
+/*Wonnie end*/
 
 bool thread_disable_prealloc_rpc_cache(uint64_t *cookie)
 {
