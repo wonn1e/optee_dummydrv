@@ -108,7 +108,7 @@ int tee_dummy_write(void){
 	//8 (char) * 4 (register) = 32
 	for(i = 0; i < 32; i++){
 		if(((char*)(read_dummy->w))[i] != 0){
-			dummy_drv.length = dummy_drv.length + i + 1;
+			dummy_drv.length = dummy_drv.length + 1;
 		}
 		((char*)(dummy_drv.data))[start_idx + i] = ((char*)(read_dummy->w))[i];
 	}
